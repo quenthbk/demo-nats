@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: ${NAME}
+  namespace: ${NAMESPACE}
+spec:
+  template:
+    serviceAccountName: ${SERVICE_ACCOUNT}
+  dependencies:
+    - name: webhook-dep
+      eventSourceName: ${WEBHOOK_SOURCE_NAME}
+      eventName: example
+  triggers:
+    - template:
+        name: trigger-k8s-job
+        k8s:
+          group: batch
+          version: v1
+          resource: jobs
+          operation: create
+          source:
+            resource:
+              apiVersion: batch/v1
+              kind: Job
+              metadata:
+                generateName: hello-job-
+              spec:
+                template:
+                  spec:
+                    containers:
+                      - name: hello
+                        image: busybox
+                        command: ["sh", "-c", "echo 'Hello from Argo Events' && sleep 60"]
+                    restartPolicy: Never
+          parameters: []

@@ -1,0 +1,10 @@
+controller:
+  enabled: true
+
+webhook:
+  enabled: true
+
+eventbus:
+  nats:
+    native:
+      replicas: 1

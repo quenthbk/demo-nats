@@ -1,0 +1,17 @@
+---
+
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata: 
+  name: ${NAME}
+  namespace: ${NAMESPACE}
+spec:
+  service:
+    ports:
+      - port: ${SERVICE_PORT}
+        targetPort: ${SERVICE_PORT}
+  webhook:
+    example:
+      endpoint: ${ENDPOINT}
+      method: POST
+      port: '${SERVICE_PORT}'
