@@ -1,0 +1,12 @@
+#!/bin/bash
+
+SVC_PORT=9090
+NAMESPACE=mon
+
+echo "------------------------------------"
+echo ""
+echo "Service available : <http://127.0.0.1:${SVC_PORT}>"
+echo ""
+echo "------------------------------------"
+
+kubectl port-forward -n ${NAMESPACE} svc/prometheus-kube-prometheus-prometheus ${SVC_PORT}

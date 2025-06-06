@@ -24,8 +24,24 @@ resource "kubernetes_namespace_v1" "argo" {
   }
 }
 
+# To refacto (for_each)
+resource "kubernetes_namespace_v1" "cnpg" {
+  metadata {
+    name = "cnpg"
+  }
+}
+
+# To refacto (for_each)
+resource "kubernetes_namespace_v1" "monitoring" {
+  metadata {
+    name = "mon"
+  }
+}
+
 locals {
   argo_ns = kubernetes_namespace_v1.argo.metadata[0].name
+  cnpg_ns = kubernetes_namespace_v1.cnpg.metadata[0].name
+  mon_ns  = kubernetes_namespace_v1.monitoring.metadata[0].name
 }
 
 resource "helm_release" "argo_events" {
@@ -37,9 +53,37 @@ resource "helm_release" "argo_events" {
   chart      = "argo-events"
   version    = var.helm_versions.argo_events # adapte à la dernière version stable
 
-  create_namespace = true
+  create_namespace = false
 
   values = [
     file("${path.module}/helm/argo-events.yaml")
+  ]
+}
+
+resource "helm_release" "cnpg" {
+  count = var.helm_versions.argo_events == null ? 0 : 1
+
+  name       = "cnpg"
+  namespace  = local.cnpg_ns
+  repository = "https://cloudnative-pg.github.io/charts"
+  chart      = "cloudnative-pg"
+  version    = var.helm_versions.cnpg # adapte à la dernière version stable
+
+  create_namespace = false
+}
+
+resource "helm_release" "prometheus" {
+  count = var.helm_versions.prometheus == null ? 0 : 1
+
+  name       = "prometheus"
+  namespace  = local.mon_ns
+  repository = "https://prometheus-community.github.io/helm-charts"
+  chart      = "kube-prometheus-stack"
+  version    = var.helm_versions.prometheus # adapte à la dernière version stable
+
+  create_namespace = false
+
+  values = [
+    file("${path.module}/helm/kube-prometheus-stack.yaml")
   ]
 }

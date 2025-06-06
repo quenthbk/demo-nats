@@ -2,6 +2,7 @@ locals {
   event_source_name = "webhook"
 }
 
+# @TODO - Add Storage Class
 resource "kubectl_manifest" "event_bus" {
   yaml_body = templatefile(
       "${path.module}/manifests/EventBus.yaml.tftpl", {
